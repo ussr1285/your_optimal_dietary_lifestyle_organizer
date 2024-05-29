@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>건강한 식단 관리</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>건강한 식단 관리의 시작, YOLO</h1>
+        <div class="meal-upload">
+            <div class="meal">
+                <div class="upload-box">
+                    <img src="/static/upload.png" alt="아침 식사 사진 업로드">
+                    <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+                        <input type="file" name="file">
+                        <input type="submit" value="Upload">
+                    </form>
+                </div>
+                <button>아침 식사 분석</button>
+            </div>
+            <div class="meal">
+                <div class="upload-box">
+                    <img src="/static/upload.png" alt="점심 식사 사진 업로드">
+                </div>
+                <button>점심 식사 분석</button>
+            </div>
+            <div class="meal">
+                <div class="upload-box">
+                    <img src="/static/upload.png" alt="저녁 식사 사진 업로드">
+                </div>
+                <button>저녁 식사 분석</button>
+            </div>
+        </div>
+        <div class="analysis">
+            <button>오늘의 영양 성분</button>
+            <div class="info">
+                <h2>식단 추천을 위한 필수 정보</h2>
+                <div class="gender">
+                    <label><input type="radio" name="gender" value="male"> 남자</label>
+                    <label><input type="radio" name="gender" value="female"> 여자</label>
+                </div>
+                <input type="text" placeholder="나이를 입력해 주세요">
+            </div>
+            <button>입력 완료</button>
+        </div>
+        
+        <div class="recommendation">
+            <button>내일의 식단 추천</button>
+            <p>필수 정보를 선택해 주세요</p>
+            <p>필수 정보를 선택해 주세요</p>
+            <p>필수 정보를 선택해 주세요</p>
+        </div>
+    </div>
+</body>
+</html>
