@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from utils import get_age_range, normalize
 
-
 food_df = pd.read_excel('통합 식품영양성분DB.xlsx', index_col='식품명')
 man_df = pd.read_excel('영양소별 평균 섭취량(남자).xlsx', index_col='영양소＼연령(세)')
 woman_df = pd.read_excel('영양소별 평균 섭취량(여자).xlsx', index_col='영양소＼연령(세)')
@@ -21,15 +20,16 @@ class Nutrient:
             meal_totals = {nutrient: 0 for nutrient in self.nutrient_columns}
 
             for food in a_meal:
-                food_nutrients = food_df.loc[food, self.nutrient_columns]
-                food_nutrients = food_nutrients.apply(pd.to_numeric, errors='coerce')
+                if food in food_df.index:  # food_df에 있는지 확인
+                    food_nutrients = food_df.loc[food, self.nutrient_columns]
+                    food_nutrients = food_nutrients.apply(pd.to_numeric, errors='coerce')
 
-                if isinstance(food_nutrients, pd.Series):
-                    for nutrient in self.nutrient_columns:
-                        meal_totals[nutrient] += food_nutrients[nutrient]
-                else:
-                    for nutrient in self.nutrient_columns:
-                        meal_totals[nutrient] += food_nutrients[nutrient].mean()
+                    if isinstance(food_nutrients, pd.Series):
+                        for nutrient in self.nutrient_columns:
+                            meal_totals[nutrient] += food_nutrients[nutrient]
+                    else:
+                        for nutrient in self.nutrient_columns:
+                            meal_totals[nutrient] += food_nutrients[nutrient].mean()
 
             meal_nutrient.append([meal_totals[nutrient] for nutrient in self.nutrient_columns])
 
@@ -65,11 +65,11 @@ class Nutrient:
 # # 객체 생성 (생성자 매개변수: 먹은 음식(2차원 리스트), 성별, 나이)
 # user = Nutrient([['바나나'], ['라면', '배추김치'], ['돈까스', '우동']], gender='남', age=24)
 
-# # 추천 음식 반환 코드 (반환 형테: 1차원 리스트)
+# # 추천 음식 반환 코드 (반환 형태: 1차원 리스트)
 # print(user.get_recommend_food())
 
-# # 섭취한 영양소 반환 코드 (반환 형테: 2차원 리스트)
+# # 섭취한 영양소 반환 코드 (반환 형태: 2차원 리스트)
 # print(user.get_nutrient_ingestion())
 
-# # 필요한 영양소 반환 코드 (반환 형테: Series)
+# # 필요한 영양소 반환 코드 (반환 형태: Series)
 # print(user.get_need_nutrition())

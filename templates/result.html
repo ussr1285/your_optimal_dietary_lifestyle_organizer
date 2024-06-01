@@ -8,13 +8,16 @@
 <body>
     <h1>Result</h1>
     <p>
-        {{user_result.get_recommend_food()}}
+        사진: {{food}}
     </p>
     <p>
-        {{user_result.get_nutrient_ingestion()}}
+        추천 음식: {{ user_result.get_recommend_food() }}
     </p>
     <p>
-        {{user_result.get_need_nutrition()}}
+        섭취한 영양소: {{ user_result.get_nutrient_ingestion() }}
+    </p>
+    <p>
+        필요한 영양소: {{ user_result.get_need_nutrition() }}
     </p>
     <a href="{{ url_for('home') }}">Go back</a>
 </body>
