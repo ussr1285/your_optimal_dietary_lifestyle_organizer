@@ -1,81 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team 9 - YOLO</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
 <body>
     <div class="container">
         <h1>건강한 식단 관리의 시작, YOLO</h1>
-        <form id="mealForm" action="javascript:void(0);" method="post" enctype="multipart/form-data">
-            <div class="meal-sections">
-                <div class="meal-section">
+        <div class="meal-sections">
+            <div class="meal-section">
+                <form id="breakfast-form" enctype="multipart/form-data">
                     <label class="custom-file-upload">
                         <h2>아침 식사 사진 업로드</h2>
-                        <input type="file" name="breakfast_image" accept="image/*" onchange="previewImage(event, 'breakfastPreview')">
-                        <img id="breakfastPreview" class="image-preview" src="#" alt="아침 식사 이미지 미리보기" style="display: none;">
+                        <input type="file" name="file" id="breakfast-file" accept="image/*"
+                            onchange="previewImage(event, 'breakfastPreview', 'breakfast')">
+                        <img id="breakfastPreview" class="image-preview" src="#" alt="아침 식사 이미지 미리보기"
+                            style="display: none;">
                     </label>
-                </div>
-                <div class="meal-section">
+                </form>
+            </div>
+            <div class="meal-section">
+                <form id="lunch-form" enctype="multipart/form-data">
                     <label class="custom-file-upload">
                         <h2>점심 식사 사진 업로드</h2>
-                        <input type="file" name="lunch_image" accept="image/*" onchange="previewImage(event, 'lunchPreview')">
+                        <input type="file" name="file" id="lunch-file" accept="image/*"
+                            onchange="previewImage(event, 'lunchPreview', 'lunch')">
                         <img id="lunchPreview" class="image-preview" src="#" alt="점심 식사 이미지 미리보기" style="display: none;">
                     </label>
-                </div>
-                <div class="meal-section">
+                </form>
+            </div>
+            <div class="meal-section">
+                <form id="dinner-form" enctype="multipart/form-data">
                     <label class="custom-file-upload">
                         <h2>저녁 식사 사진 업로드</h2>
-                        <input type="file" name="dinner_image" accept="image/*" onchange="previewImage(event, 'dinnerPreview')">
+                        <input type="file" name="file" id="dinner-file" accept="image/*"
+                            onchange="previewImage(event, 'dinnerPreview', 'dinner')">
                         <img id="dinnerPreview" class="image-preview" src="#" alt="저녁 식사 이미지 미리보기" style="display: none;">
                     </label>
+                </form>
+            </div>
+        </div>
+        
+        <form id="mealForm" action="{{ url_for('submit') }}" method="post" enctype="multipart/form-data">
+            <!--<button type="submit" onclick="showResults()">오늘의 식사 분석</button>-->
+            <div class="results-container1">
+                <div class="result-title-box">
+                    <h3>오늘의 영양 성분</h3>
+                </div>
+                <div class="result-title-box">
+                    <h3>식단 추천을 위한 필수 정보</h3>
+                </div>
+                <div class="result-title-box">
+                    <h3>내일의 식단 추천</h3>
                 </div>
             </div>
-            <button type="submit" onclick="showResults()">오늘의 식사 분석</button>
+            <div class="results-container2">
+                <div class="result-content-box">
+                    <p>‘오늘의 식사 분석’ 버튼을 눌러서 영양 성분을 확인할 수 있어요.</p>
+                </div>
+                <div class="result-content-box">
+                    <div>
+                        <label><input type="radio" name="gender" value="남"> 남자</label>
+                        <label><input type="radio" name="gender" value="여"> 여자</label>
+                    </div>
+                    <div>
+                        <label>나이:</label>
+                        <input type="number" name="age" value="19" min="1">
+                    </div>
+                    <button type="submit">오늘의 식사 분석</button>
+                </div>
         </form>
-        <div class="results-container1">
-            <div class="result-title-box">
-                <h3>오늘의 영양 성분</h3>
-            </div>
-            <div class="result-title-box">
-                <h3>식단 추천을 위한 필수 정보</h3>
-            </div>
-            <div class="result-title-box">
-                <h3>내일의 식단 추천</h3>
-            </div>
+        <div class="result-content-box">
+            <p>필수 정보를 선택해 주세요.</p>
         </div>
-        <div class="results-container2">
-            <div class="result-content-box">
-                <p>‘오늘의 식사 분석’ 버튼을 눌러서 영양 성분을 확인할 수 있어요.</p>
-            </div>
-            <div class="result-content-box">
-                <div>
-                    <label><input type="radio" name="gender" value="남"> 남자</label>
-                    <label><input type="radio" name="gender" value="여"> 여자</label>
-                </div>
-                <div>
-                    <label>나이:</label>
-                    <input type="text" name="age">
-                </div>
-                <button type="submit">입력 완료</button>
-            </div>
-            <div class="result-content-box">
-                <p>필수 정보를 선택해 주세요.</p>
-            </div>
-        </div>
+    </div>
     </div>
 
     <script>
-        function previewImage(event, previewId) {
+        function previewImage(event, previewId, meal) {
             var reader = new FileReader();
-            reader.onload = function() {
+            reader.onload = function () {
                 var output = document.getElementById(previewId);
                 output.src = reader.result;
                 output.style.display = 'block';
             }
             reader.readAsDataURL(event.target.files[0]);
+            var form = document.getElementById(meal + '-form');
+            var formData = new FormData(form);
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload/' + meal, true);
+            xhr.send(formData);
         }
 
         function showResults() {
@@ -85,4 +103,5 @@
         }
     </script>
 </body>
+
 </html>

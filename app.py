@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, send_from_directory
 import os
-import sys
 import Food_recommend as fr
 from werkzeug.utils import secure_filename
 import model
@@ -49,6 +48,7 @@ def home():
     return render_template('index.html')
 
 MEALS = ['breakfast', 'lunch', 'dinner']
+NUTRIENTS = ['kcal', 'protein', 'fat', 'carb', 'sugars', 'sodium']
 ### image upload section (meal:= breakfast, lunch, dinner)
 
 def get_next_file_index(meal):
@@ -81,21 +81,15 @@ def uploaded_file(meal, filename):
         return "Invalid meal type", 400
     return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], meal), filename)
 
-def render_food_template(food_list, food_nutrient, results):
-    template_data = {'user_result': results}
-
-    for i in range(min(len(food_list), len(MEALS))):
-        meal = MEALS[i]
-        template_data[meal] = food_list[i]
-        template_data[f'{meal}_nutrient'] = food_nutrient[i]
-
-    return render_template('result.html', **template_data)
+def split_Nutrient(results):
+    return 0
 
 @app.route('/submit', methods=['POST'])
 def submit():
     gender = request.form.get('gender')
     age = request.form.get('age')
     
+    image_path = dict()
     food_list = []
     for meal in MEALS:
         meal_folder = os.path.join(UPLOAD_FOLDER, meal)
@@ -104,11 +98,29 @@ def submit():
             continue
         last_filename = ''.join((os.listdir(meal_folder)[-1]))
         filepath = '/'.join(['.', UPLOAD_FOLDER, meal, last_filename])
+        image_path[f'{meal}'] = filepath
         food_list.append(yolo.img_2_txt(filepath))
     results = fr.Nutrient(food_list=food_list, gender=gender, age=int(age))
     food_nutrient = results.get_nutrient_ingestion()
 
-    return render_food_template(food_list, food_nutrient, results)
+    food = dict(
+        breakfast=dict(),
+        lunch=dict(),
+        dinner=dict(),
+        need=dict(),
+        recommend=dict()
+    )
+
+    for i in range(len(MEALS)):
+        food[f'{MEALS[i]}']['name'] = food_list[i]
+        for j in range(len(NUTRIENTS)):
+            food[f'{MEALS[i]}'][f'{NUTRIENTS[j]}'] = food_nutrient[i][j] # split_Nutrient(food_nutrient[i][j])
+    for j in range(len(NUTRIENTS)):
+        food['need'][f'{NUTRIENTS[j]}'] = results.get_need_nutrition()[j]
+    food['recommend']['one'] = results.get_recommend_food()[0]
+    food['recommend']['two'] = results.get_recommend_food()[1]
+    food['recommend']['three'] = results.get_recommend_food()[2]
+    return render_template('result.html', food=food, image_path=image_path)
 
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):

@@ -20,12 +20,12 @@ class YOLOModel:
             food_cls.append(list(food))
         return sum(food_cls, [])
 
-# # 테스트 코드
-# if __name__ == "__main__":
-#     yolo_model = YOLOModel()
-#     image_path = 'uploads/A220132XX_33201.jpg'
-#     food_cls = yolo_model.img_2_txt(image_path)
-#     print(food_cls)
+# 테스트 코드
+if __name__ == "__main__":
+    yolo_model = YOLOModel()
+    image_path = 'uploads/breakfast/file_0.jpg'
+    food_cls = yolo_model.img_2_txt(image_path)
+    print(food_cls)
 
 
 # # 테스트 코드
