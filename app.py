@@ -21,24 +21,35 @@ def set_response_headers(response):
 
 yolo = model.YOLOModel()
 
-# 파일 확장자 확인
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+import shutil
+import os
+
+def delete_folder(path):
+    # 폴더가 존재하는지 확인
+    if os.path.exists(path):
+        # 폴더와 폴더 내 모든 내용 삭제
+        shutil.rmtree(path)
+        print(f"The folder '{path}' has been deleted.")
+    else:
+        print(f"The folder '{path}' does not exist.")
+
+def check_directory():
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
+    for meal in MEALS:
+        meal_folder = os.path.join(UPLOAD_FOLDER, meal)
+        if not os.path.exists(meal_folder):
+            os.makedirs(meal_folder)
 
 @app.route('/')
 def home():
+    # 삭제할 폴더 경로
+    delete_folder("uploads")
+    check_directory()
     return render_template('index.html')
 
-### image upload section (meal:= breakfast, lunch, dinner)
-@app.route('/uploadtest')
-def upload_test():
-    return render_template('uploadtest.html')
-
 MEALS = ['breakfast', 'lunch', 'dinner']
-for meal in MEALS:
-    meal_folder = os.path.join(UPLOAD_FOLDER, meal)
-    if not os.path.exists(meal_folder):
-        os.makedirs(meal_folder)
+### image upload section (meal:= breakfast, lunch, dinner)
 
 def get_next_file_index(meal):
     meal_folder = os.path.join(UPLOAD_FOLDER, meal)
@@ -63,7 +74,6 @@ def upload_file(meal):
         filepath = os.path.join(meal_folder, new_filename)
         file.save(filepath)
         return jsonify({"message": "File uploaded successfully", "filepath": filepath})
-    
 
 @app.route('/uploads/<meal>/<filename>')
 def uploaded_file(meal, filename):
@@ -89,6 +99,9 @@ def submit():
     food_list = []
     for meal in MEALS:
         meal_folder = os.path.join(UPLOAD_FOLDER, meal)
+        if not os.listdir(meal_folder): 
+            food_list.append([])
+            continue
         last_filename = ''.join((os.listdir(meal_folder)[-1]))
         filepath = '/'.join(['.', UPLOAD_FOLDER, meal, last_filename])
         food_list.append(yolo.img_2_txt(filepath))
@@ -103,19 +116,3 @@ if __name__ == '__main__':
         os.makedirs(app.config['UPLOAD_FOLDER'])
     app.run(host='0.0.0.0', debug=True)
 
-
-# @app.route('/test')
-# def testhome():
-#     return render_template('index_test.html')
-
-
-
-# @app.route('/submit_test', methods=['POST'])
-# def submit_test():
-#     gender = request.form.get('gender')
-#     age = request.form.get('age')
-
-#     food_list = yolo.img_2_txt("./uploads/dinner/file_0.jpg") 
-    
-#     results = fr.Nutrient((food_list), gender=gender, age=int(age))
-#     return render_template('result_test.html', food=food_list, user_result=results)
