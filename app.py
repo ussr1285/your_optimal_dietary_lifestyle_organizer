@@ -70,17 +70,16 @@ def uploaded_file(meal, filename):
     if meal not in MEALS:
         return "Invalid meal type", 400
     return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], meal), filename)
-### /image upload section
 
-# def render_food_template(food_list, food_nutrient, results):
-#     template_data = {'user_result': results}
+def render_food_template(food_list, food_nutrient, results):
+    template_data = {'user_result': results}
 
-#     for i in range(min(len(food_list), len(MEALS))):
-#         meal = MEALS[i]
-#         template_data[meal] = food_list[i]
-#         template_data[f'{meal}_nutrient'] = food_nutrient[i]
+    for i in range(min(len(food_list), len(MEALS))):
+        meal = MEALS[i]
+        template_data[meal] = food_list[i]
+        template_data[f'{meal}_nutrient'] = food_nutrient[i]
 
-#     return render_template('result.html', **template_data)
+    return render_template('result.html', **template_data)
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -90,23 +89,14 @@ def submit():
     food_list = []
     for meal in MEALS:
         meal_folder = os.path.join(UPLOAD_FOLDER, meal)
-        last_filename = ''.join((os.listdir(meal_folder)[:-1]))
+        last_filename = ''.join((os.listdir(meal_folder)[-1]))
         filepath = '/'.join(['.', UPLOAD_FOLDER, meal, last_filename])
         food_list.append(yolo.img_2_txt(filepath))
 
     results = fr.Nutrient(food_list=food_list, gender=gender, age=int(age))
     food_nutrient = results.get_nutrient_ingestion()
-    # print(food_nutrient)
 
-    template_data = {'user_result': results}
-
-    for i in range(min(len(food_list), len(MEALS))):
-        meal = MEALS[i]
-        template_data[meal] = food_list[i]
-        template_data[f'{meal}_nutrient'] = food_nutrient[i]
-
-    return render_template('result.html', **template_data)
-    # return render_food_template(food_list, food_nutrient, results)
+    return render_food_template(food_list, food_nutrient, results)
 
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):

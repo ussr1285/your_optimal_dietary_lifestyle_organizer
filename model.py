@@ -1,5 +1,5 @@
+import unicodedata
 from ultralytics import YOLO
-from Food_recommend import Nutrient
 
 class YOLOModel:
     def __init__(self):
@@ -7,20 +7,26 @@ class YOLOModel:
 
     def img_2_txt(self, image_path: str):
         results = self.model(image_path)
-
         dict_class = results[0].names
         food_cls = []
         for result in results:
             food = set()
             for cls in result.boxes.cls:
                 cls_index = int(cls)
-                class_name = dict_class[cls_index]  # 클래스 인덱스에 해당하는 클래스 이름을 얻음
-                food.add(class_name)  # 클래스 이름 출력
+                class_name = dict_class[cls_index]
+                # 문자열을 NFC 형태로 정규화
+                normalized_name = unicodedata.normalize('NFC', class_name)
+                food.add(normalized_name)
             food_cls.append(list(food))
-            # for chara in food:
-            #     print(chara)
-        
         return sum(food_cls, [])
+
+# # 테스트 코드
+# if __name__ == "__main__":
+#     yolo_model = YOLOModel()
+#     image_path = 'uploads/A220132XX_33201.jpg'
+#     food_cls = yolo_model.img_2_txt(image_path)
+#     print(food_cls)
+
 
 # # 테스트 코드
 # if __name__ == "__main__":
