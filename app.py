@@ -10,14 +10,14 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # 정적 파일 캐시 비활성화
+# app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # 정적 파일 캐시 비활성화
 
-@app.after_request
-def set_response_headers(response):
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '0'
-    return response
+# @app.after_request
+# def set_response_headers(response):
+#     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+#     response.headers['Pragma'] = 'no-cache'
+#     response.headers['Expires'] = '0'
+#     return response
 
 yolo = model.YOLOModel()
 
@@ -95,7 +95,8 @@ def render_food_template(food_list, food_nutrient, results):
 def submit():
     gender = request.form.get('gender')
     age = request.form.get('age')
-
+    age = '0' if age == None else age
+    
     food_list = []
     for meal in MEALS:
         meal_folder = os.path.join(UPLOAD_FOLDER, meal)
