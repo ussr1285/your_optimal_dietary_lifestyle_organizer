@@ -66,14 +66,19 @@ def uploaded_file(meal, filename):
 def submit():
     gender = request.form.get('gender')
     age = request.form.get('age')
-    # breakfast = request.form.getlist('breakfast')
-    # lunch = request.form.getlist('lunch')
-    # dinner = request.form.getlist('dinner')
-    # food_list = [breakfast, lunch, dinner]
-    # yolo.img_2_txt('uploads/' + request.form.get('filename'), food_list)
-    food_list = yolo.img_2_txt('uploads/A220132XX_33201.jpg')
-    user = fr.Nutrient(food_list, gender=gender, age=int(age))
-    return render_template('result.html', food=food_list, user_result=user)
+
+    food_list = list()
+    for meal in MEALS:
+        meal_folder = os.path.join(UPLOAD_FOLDER, meal)
+        current_file = os.listdir(meal_folder)[:-1]
+        print(current_file)
+        food_list.append(yolo.img_2_txt(current_file))
+    
+    results = []
+    for food in food_list:
+        results.append(fr.Nutrient((food), gender=gender, age=int(age)))
+
+    return render_template('result.html', food=food_list, user_result=results)
 
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):

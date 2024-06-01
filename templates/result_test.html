@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category Result</title>
+</head>
+<body>
+    <h1>Result</h1>
+    <p>
+        사진: {{food}}
+    </p>
+    <p>
+        추천 음식: {{ user_result.get_recommend_food() }}
+    </p>
+    <p>
+        섭취한 영양소: {{ user_result.get_nutrient_ingestion() }}
+    </p>
+    <p>
+        필요한 영양소: {{ user_result.get_need_nutrition() }}
+    </p>
+    <a href="{{ url_for('home') }}">Go back</a>
+</body>
+</html>

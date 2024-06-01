@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Category</title>
+</head>
+<body>
+    <h1>성별을 선택해주세요.</h1>
+    <form action="{{ url_for('submit') }}" method="post">
+        <label for="gender">Choose a category:</label>
+        <select name="gender" id="gender">
+            <option value="남">남</option>
+            <option value="여">여</option>
+        </select>
+        
+        <label for="breakfast">아침 식사:</label>
+        <select name="breakfast" id="breakfast" multiple>
+            <option value="바나나">바나나</option>
+            <option value="라면">라면</option>
+            <option value="배추김치">배추김치</option>
+            <option value="떡볶이">떡볶이</option>
+            <!-- 다른 옵션들 추가 -->
+        </select>
+
+        <label for="lunch">점심 식사:</label>
+        <select name="lunch" id="lunch" multiple>
+            <option value="바나나">바나나</option>
+            <option value="라면">라면</option>
+            <option value="배추김치">배추김치</option>
+            <option value="떡볶이">떡볶이</option>
+            <!-- 다른 옵션들 추가 -->
+        </select>
+
+        <label for="dinner">저녁 식사:</label>
+        <select name="dinner" id="dinner" multiple>
+            <option value="바나나">바나나</option>
+            <option value="라면">라면</option>
+            <option value="배추김치">배추김치</option>
+            <option value="떡볶이">떡볶이</option>
+            <!-- 다른 옵션들 추가 -->
+        </select>
+
+        <input type="number" name="age" id="age" placeholder="나이">
+
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
+
+
+
