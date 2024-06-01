@@ -9,6 +9,7 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # 정적 파일 캐시 비활성화
 
 yolo = model.YOLOModel()
 
@@ -55,6 +56,7 @@ def upload_file(meal):
         file.save(filepath)
         return jsonify({"message": "File uploaded successfully", "filepath": filepath})
     
+
 @app.route('/uploads/<meal>/<filename>')
 def uploaded_file(meal, filename):
     if meal not in MEALS:
@@ -62,25 +64,59 @@ def uploaded_file(meal, filename):
     return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], meal), filename)
 ### /image upload section
 
+def render_food_template(food_list, food_nutrient, results):
+    template_data = {'user_result': results}
+
+    for i in range(min(len(food_list), len(MEALS))):
+        meal = MEALS[i]
+        template_data[meal] = food_list[i]
+        template_data[f'{meal}_nutrient'] = food_nutrient[i]
+
+    return render_template('result.html', **template_data)
+
 @app.route('/submit', methods=['POST'])
 def submit():
     gender = request.form.get('gender')
     age = request.form.get('age')
 
-    food_list = list()
+    food_list = []
     for meal in MEALS:
         meal_folder = os.path.join(UPLOAD_FOLDER, meal)
-        current_file = os.listdir(meal_folder)[:-1]
-        print(current_file)
-        food_list.append(yolo.img_2_txt(current_file))
-    
-    results = []
-    for food in food_list:
-        results.append(fr.Nutrient((food), gender=gender, age=int(age)))
+        last_filename = ''.join((os.listdir(meal_folder)[:-1]))
+        filepath = '/'.join(['.', UPLOAD_FOLDER, meal, last_filename])
+        food_list.append(yolo.img_2_txt(filepath))
 
-    return render_template('result.html', food=food_list, user_result=results)
+    # results = fr.Nutrient((food_list), gender=gender, age=int(age))
+    # results = fr.Nutrient((food_list), gender='남', age=23)
+    results = fr.Nutrient([['오렌지'], ['달걀말이'], ['달걀말이']], gender=gender, age=int(age))
+    # results = fr.Nutrient([['오렌지'], ['달걀말이'], ['달걀말이']], gender=gender, age=32)
+    # results = fr.Nutrient([['오렌지'], ['달걀말이'], ['달걀말이']], gender='남', age=23)
+    # print("@@@@@@@@@@@@@")
+    # print(type(food_list))
+    # print(type([['바나나'], ['라면', '배추김치'], ['돈까스', '우동']]))
+    food_nutrient = results.get_nutrient_ingestion()
+    # print(food_nutrient)
+
+    return render_food_template(food_list, food_nutrient, results)
 
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
     app.run(host='0.0.0.0', debug=True)
+
+
+# @app.route('/test')
+# def testhome():
+#     return render_template('index_test.html')
+
+
+
+# @app.route('/submit_test', methods=['POST'])
+# def submit_test():
+#     gender = request.form.get('gender')
+#     age = request.form.get('age')
+
+#     food_list = yolo.img_2_txt("./uploads/dinner/file_0.jpg") 
+    
+#     results = fr.Nutrient((food_list), gender=gender, age=int(age))
+#     return render_template('result_test.html', food=food_list, user_result=results)

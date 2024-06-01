@@ -18,14 +18,14 @@ class YOLOModel:
                 food.add(class_name)  # 클래스 이름 출력
             food_cls.append(list(food))
         
-        return food_cls
+        return sum(food_cls, [])
 
-# 테스트 코드
-if __name__ == "__main__":
-    yolo_model = YOLOModel()
-    image_path = 'uploads/A220132XX_33201.jpg'  # 테스트 이미지 경로
-    food_cls = yolo_model.img_2_txt(image_path)
-    print(food_cls)
+# # 테스트 코드
+# if __name__ == "__main__":
+#     yolo_model = YOLOModel()
+#     image_path = 'uploads/A220132XX_33201.jpg'  # 테스트 이미지 경로
+#     food_cls = yolo_model.img_2_txt(image_path)
+#     print(food_cls)
 
 # # 이미지 경로와 저장 경로 설정
 # image_path = 'uploads/A220132XX_33201.jpg' # 이미지 경로 

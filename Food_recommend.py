@@ -15,11 +15,13 @@ class Nutrient:
     
     def get_nutrient_ingestion(self):
         meal_nutrient = []
-
+        # print(food_df.index[0])
         for a_meal in self.food_list:
             meal_totals = {nutrient: 0 for nutrient in self.nutrient_columns}
-
             for food in a_meal:
+                print("food : {0} == {1}".format(food, 1 if food in food_df.index else 0))
+                print("@@@@@@@@@@@@@@@@@@@@@@@@@")
+                print(food in food_df.index)
                 if food in food_df.index:  # food_df에 있는지 확인
                     food_nutrients = food_df.loc[food, self.nutrient_columns]
                     food_nutrients = food_nutrients.apply(pd.to_numeric, errors='coerce')
@@ -32,7 +34,6 @@ class Nutrient:
                             meal_totals[nutrient] += food_nutrients[nutrient].mean()
 
             meal_nutrient.append([meal_totals[nutrient] for nutrient in self.nutrient_columns])
-
         return meal_nutrient
     
     def get_need_nutrition(self):
