@@ -82,9 +82,6 @@ def uploaded_file(meal, filename):
         return "Invalid meal type", 400
     return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], meal), filename)
 
-def split_Nutrient(results):
-    return 0
-
 @app.route('/submit', methods=['POST'])
 def submit():
     gender = request.form.get('gender')
