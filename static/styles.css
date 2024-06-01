@@ -1,0 +1,186 @@
+/* 한도연 */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #EFEFE4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    width: 1080px;
+    height: auto;
+    margin: auto;
+    padding: 1rem;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #161718;
+    margin-top: 1.5rem;
+    margin-left: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.meal-sections {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.meal-section {
+    flex: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.meal-section h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.custom-file-upload {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 240px;
+    height: 160px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    background-color: #EFEFE4;
+    color: #161718;
+    border-radius: 0.5rem;
+    text-align: center;
+    transition: background-color 0.3s;
+    border: 2px dashed #5D6247;
+    position: relative;
+    overflow: hidden;
+}
+
+.image-preview {
+    max-width: 100%;
+    max-height: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: block;
+    object-fit: contain;
+    object-position: center;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+button {
+    background-color: #749C03;
+    width: 200px;
+    height: 40px;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 400;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s;
+    margin-top: 1rem;
+}
+
+button:hover {
+    background-color: #5e7d02;
+}
+
+.results-container1 {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 2.5rem;
+    box-sizing: border-box;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.results-container2 {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.result-title-box {
+    width: 280px;
+    height: 60px;
+    background-color: #5D6247;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.result-content-box {
+    width: 280px;
+    height: 240px;
+    background-color: #EFEFE4;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    flex-direction: column;
+    box-sizing: border-box;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.result-title-box h3 {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #ffffff;
+}
+
+.result-content-box p {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #161718;
+}
+
+.result-content-box label {
+    display: block;
+}
+
+.result-content-box input[type="text"] {
+    width: 80%;
+    padding: 0.5rem;
+    border: 1px solid #dcdcdc;
+    border-radius: 0.5rem;
+}

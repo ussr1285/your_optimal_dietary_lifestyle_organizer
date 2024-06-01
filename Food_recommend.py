@@ -37,7 +37,7 @@ class Nutrient:
         if self.gender=='남':
             need_nutrition = man_df.loc[:, self.age] - data.sum(axis=1)
         else:
-            need_nutrition = woman_df.loc[:, self.age] - data.T.sum(axis=1)
+            need_nutrition = woman_df.loc[:, self.age] - data.sum(axis=1)
         return need_nutrition
     
     def get_recommend_food(self):
@@ -54,7 +54,6 @@ class Nutrient:
         remaining_distances = remaining_distances.drop(second_nearest_index)
         third_nearest_index = remaining_distances[~remaining_distances.index.str.contains('|'.join(selected_indices))].idxmin()
         selected_indices.append(third_nearest_index)
-        
         return selected_indices
 
 # ## 사용 방법

@@ -95,7 +95,6 @@ def render_food_template(food_list, food_nutrient, results):
 def submit():
     gender = request.form.get('gender')
     age = request.form.get('age')
-    age = '0' if age == None else age
     
     food_list = []
     for meal in MEALS:
@@ -106,7 +105,6 @@ def submit():
         last_filename = ''.join((os.listdir(meal_folder)[-1]))
         filepath = '/'.join(['.', UPLOAD_FOLDER, meal, last_filename])
         food_list.append(yolo.img_2_txt(filepath))
-
     results = fr.Nutrient(food_list=food_list, gender=gender, age=int(age))
     food_nutrient = results.get_nutrient_ingestion()
 
