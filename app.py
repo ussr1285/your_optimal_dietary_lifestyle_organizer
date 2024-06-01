@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, send_from_directory
 import os
+import sys
 import Food_recommend as fr
 from werkzeug.utils import secure_filename
 import model
@@ -10,6 +11,13 @@ UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # 정적 파일 캐시 비활성화
+
+@app.after_request
+def set_response_headers(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 yolo = model.YOLOModel()
 
@@ -64,15 +72,15 @@ def uploaded_file(meal, filename):
     return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], meal), filename)
 ### /image upload section
 
-def render_food_template(food_list, food_nutrient, results):
-    template_data = {'user_result': results}
+# def render_food_template(food_list, food_nutrient, results):
+#     template_data = {'user_result': results}
 
-    for i in range(min(len(food_list), len(MEALS))):
-        meal = MEALS[i]
-        template_data[meal] = food_list[i]
-        template_data[f'{meal}_nutrient'] = food_nutrient[i]
+#     for i in range(min(len(food_list), len(MEALS))):
+#         meal = MEALS[i]
+#         template_data[meal] = food_list[i]
+#         template_data[f'{meal}_nutrient'] = food_nutrient[i]
 
-    return render_template('result.html', **template_data)
+#     return render_template('result.html', **template_data)
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -86,18 +94,19 @@ def submit():
         filepath = '/'.join(['.', UPLOAD_FOLDER, meal, last_filename])
         food_list.append(yolo.img_2_txt(filepath))
 
-    # results = fr.Nutrient((food_list), gender=gender, age=int(age))
-    # results = fr.Nutrient((food_list), gender='남', age=23)
-    results = fr.Nutrient([['오렌지'], ['달걀말이'], ['달걀말이']], gender=gender, age=int(age))
-    # results = fr.Nutrient([['오렌지'], ['달걀말이'], ['달걀말이']], gender=gender, age=32)
-    # results = fr.Nutrient([['오렌지'], ['달걀말이'], ['달걀말이']], gender='남', age=23)
-    # print("@@@@@@@@@@@@@")
-    # print(type(food_list))
-    # print(type([['바나나'], ['라면', '배추김치'], ['돈까스', '우동']]))
+    results = fr.Nutrient(food_list=food_list, gender=gender, age=int(age))
     food_nutrient = results.get_nutrient_ingestion()
     # print(food_nutrient)
 
-    return render_food_template(food_list, food_nutrient, results)
+    template_data = {'user_result': results}
+
+    for i in range(min(len(food_list), len(MEALS))):
+        meal = MEALS[i]
+        template_data[meal] = food_list[i]
+        template_data[f'{meal}_nutrient'] = food_nutrient[i]
+
+    return render_template('result.html', **template_data)
+    # return render_food_template(food_list, food_nutrient, results)
 
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):

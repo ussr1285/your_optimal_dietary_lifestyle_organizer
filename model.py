@@ -17,6 +17,8 @@ class YOLOModel:
                 class_name = dict_class[cls_index]  # 클래스 인덱스에 해당하는 클래스 이름을 얻음
                 food.add(class_name)  # 클래스 이름 출력
             food_cls.append(list(food))
+            # for chara in food:
+            #     print(chara)
         
         return sum(food_cls, [])
 
