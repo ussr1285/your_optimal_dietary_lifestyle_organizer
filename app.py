@@ -68,6 +68,7 @@ def upload_file(meal):
         return "No selected file", 400
     if file:
         next_index = get_next_file_index(meal)
+        print(os.path.splitext(secure_filename(file.filename)))
         file_extension = os.path.splitext(secure_filename(file.filename))[1]
         new_filename = f"file_{next_index}{file_extension}"
         meal_folder = os.path.join(UPLOAD_FOLDER, meal)
@@ -115,13 +116,17 @@ def submit():
     for i in range(len(MEALS)):
         food[f'{MEALS[i]}']['name'] = food_list[i]
         for j in range(len(NUTRIENTS)):
-            food[f'{MEALS[i]}'][f'{NUTRIENTS[j]}'] = food_nutrient[i][j] # split_Nutrient(food_nutrient[i][j])
+            food[f'{MEALS[i]}'][f'{NUTRIENTS[j]}'] = food_nutrient[i][j] if food_nutrient[i][j] == food_nutrient[i][j] else 0.0 # split_Nutrient(food_nutrient[i][j])
     for j in range(len(NUTRIENTS)):
-        food['today'][f'{NUTRIENTS[j]}'] = food['breakfast'][f'{NUTRIENTS[j]}'] + food['lunch'][f'{NUTRIENTS[j]}'] + food['dinner'][f'{NUTRIENTS[j]}']
-        food['need'][f'{NUTRIENTS[j]}'] = results.get_need_nutrition()[j]
+        today = round(food['breakfast'][f'{NUTRIENTS[j]}'] + food['lunch'][f'{NUTRIENTS[j]}'] + food['dinner'][f'{NUTRIENTS[j]}'], 2)
+        need = results.get_need_nutrition()[j] if results.get_need_nutrition()[j] == results.get_need_nutrition()[j] else 0.0
+        need = round(need, 2)
+        food['today'][f'{NUTRIENTS[j]}'] = today
+        food['need'][f'{NUTRIENTS[j]}'] = need
     food['recommend']['one'] = results.get_recommend_food()[0]
     food['recommend']['two'] = results.get_recommend_food()[1]
     food['recommend']['three'] = results.get_recommend_food()[2]
+    
     return render_template('result.html', food=food, image_path=image_path)
 
 if __name__ == '__main__':
