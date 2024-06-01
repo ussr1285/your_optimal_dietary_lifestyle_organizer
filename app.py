@@ -107,6 +107,7 @@ def submit():
         breakfast=dict(),
         lunch=dict(),
         dinner=dict(),
+        today=dict(),
         need=dict(),
         recommend=dict()
     )
@@ -116,6 +117,7 @@ def submit():
         for j in range(len(NUTRIENTS)):
             food[f'{MEALS[i]}'][f'{NUTRIENTS[j]}'] = food_nutrient[i][j] # split_Nutrient(food_nutrient[i][j])
     for j in range(len(NUTRIENTS)):
+        food['today'][f'{NUTRIENTS[j]}'] = food['breakfast'][f'{NUTRIENTS[j]}'] + food['lunch'][f'{NUTRIENTS[j]}'] + food['dinner'][f'{NUTRIENTS[j]}']
         food['need'][f'{NUTRIENTS[j]}'] = results.get_need_nutrition()[j]
     food['recommend']['one'] = results.get_recommend_food()[0]
     food['recommend']['two'] = results.get_recommend_food()[1]

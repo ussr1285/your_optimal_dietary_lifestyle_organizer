@@ -42,7 +42,7 @@ class Nutrient:
     
     def get_recommend_food(self):
         normalized_food_df, need_nutrition = normalize(food_df, self.get_need_nutrition())
-        distances = ((normalized_food_df - need_nutrition) ** 2).sum(axis=1)
+        distances = ((normalized_food_df - need_nutrition) ** 2).sum(axis=1).sort_values()
 
         first_nearest_index = distances.idxmin()
         selected_indices = [first_nearest_index]

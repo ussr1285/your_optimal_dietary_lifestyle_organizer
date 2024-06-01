@@ -17,7 +17,7 @@
                     <label class="custom-file-upload">
                         <input type="file" name="file" id="breakfast-file" accept="image/*"
                             onchange="previewImage(event, 'breakfastPreview', 'breakfast')">
-                        <img id="breakfastPreview" class="image-preview" src="{{ image_path.breakfast }}" alt="아침 식사 이미지 미리보기">
+                        <img id="breakfastPreview" class="image-preview" src="{{ image_path.breakfast }}" alt="아침 식사 이미지 없음">
                     </label>
                 </form>
             </div>
@@ -26,7 +26,7 @@
                     <label class="custom-file-upload">
                         <input type="file" name="file" id="lunch-file" accept="image/*"
                             onchange="previewImage(event, 'lunchPreview', 'lunch')">
-                        <img id="lunchPreview" class="image-preview" src="{{ image_path.lunch }}" alt="점심 식사 이미지 미리보기">
+                        <img id="lunchPreview" class="image-preview" src="{{ image_path.lunch }}" alt="점심 식사 이미지 없음">
                     </label>
                 </form>
             </div>
@@ -35,7 +35,7 @@
                     <label class="custom-file-upload">
                         <input type="file" name="file" id="dinner-file" accept="image/*"
                             onchange="previewImage(event, 'dinnerPreview', 'dinner')">
-                        <img id="dinnerPreview" class="image-preview" src="{{ image_path.dinner }}" alt="저녁 식사 이미지 미리보기">
+                        <img id="dinnerPreview" class="image-preview" src="{{ image_path.dinner }}" alt="저녁 식사 이미지 없음">
                     </label>
                 </form>
             </div>
@@ -43,29 +43,29 @@
         
         <form id="mealForm" action="{{ url_for('submit') }}" method="post" enctype="multipart/form-data">
             <!---<button type="submit" onclick="showResults()">오늘의 식사 분석</button>--->
-            <div class="results-container1">
-                <div class="result-title-box">
-                    <h3>오늘의 영양 성분</h3>
-                </div>
-                <div class="result-title-box">
-                    <h3>식단 추천을 위한 필수 정보</h3>
-                </div>
-                <div class="result-title-box">
-                    <h3>내일의 식단 추천</h3>
-                </div>
-            </div>
             <div class="results-container2">
                 <div class="result-content-box">
-                    <p>‘오늘의 식사 분석’ 버튼을 눌러서 영양 성분을 확인할 수 있어요.</p>
+                    <h3>오늘의 영양 성분</h3>
+                    <p>
+                        칼로리 : {{ food.today.kcal }}, 단백질 : {{ food.today.protein }}, 
+                        지방 : {{ food.today.fat }}, 탄수화물 : {{ food.today.carb }}, 
+                        당류 : {{ food.today.sugars }}, 나트륨 : {{ food.today.sodium }}
+                    </p>
                 </div>
                 <div class="result-content-box">
-                    <button type="submit" onclick="showResults()">입력 완료</button>
+                    <h3>더 필요한 영양분</h3>
+                    <p>
+                        칼로리 : {{ food.need.kcal }}, 단백질 : {{ food.need.protein }}, 
+                        지방 : {{ food.need.fat }}, 탄수화물 : {{ food.need.carb }}, 
+                        당류 : {{ food.need.sugars }}, 나트륨 : {{ food.need.sodium }}
+                    </p>
+                    <a href="{{ url_for('home') }}">Go back</a>
                 </div>
         </form>
         <div class="result-content-box">
             <p>아침 : {{ food.breakfast.name }}, 점심 : {{ food.lunch.name }}, 저녁 : {{ food.dinner.name }}</p>
             <!--
-                <p>
+            <p>
                 칼로리 : {{ food.breakfast.kcal }}, 단백질 : {{ food.breakfast.protein }}, 
                 지방 : {{ food.breakfast.fat }}, 탄수화물 : {{ food.breakfast.carb }}, 
                 당류 : {{ food.breakfast.sugars }}, 나트륨 : {{ food.breakfast.sodium }}
