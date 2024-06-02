@@ -49,34 +49,32 @@
             <!--<button type="submit" onclick="showResults()">오늘의 식사 분석</button>-->
             <div class="results-container1">
                 <div class="result-title-box">
-                    <h3>오늘의 영양 성분</h3>
-                </div>
-                <div class="result-title-box">
                     <h3>식단 추천을 위한 필수 정보</h3>
-                </div>
-                <div class="result-title-box">
-                    <h3>내일의 식단 추천</h3>
                 </div>
             </div>
             <div class="results-container2">
                 <div class="result-content-box">
-                    <p>‘오늘의 식사 분석’ 버튼을 눌러서 영양 성분을 확인할 수 있어요.</p>
-                </div>
-                <div class="result-content-box">
                     <div>
-                        <label><input type="radio" name="gender" value="남" checked="checked"> 남자</label>
-                        <label><input type="radio" name="gender" value="여"> 여자</label>
+                        <label>
+                        <input type="radio" name="gender" value="남"/>
+                            <div class="radio-man box">
+                                <span>남자</span>
+                            </div>
+                        </label>
+                        <label>
+                        <input type="radio" name="gender" value="여"/>
+                            <div class="radio-woman box">
+                                <span>여자</span>
+                            </div>
+                        </label>
                     </div>
                     <div>
-                        <label>나이:</label>
-                        <input type="number" name="age" value="19" min="1">
+                        <input type="number" name="age" min="1" placeholder="나이를 입력하세요">
                     </div>
-                    <button type="submit">오늘의 식사 분석</button>
                 </div>
+            </div>
+            <button type="submit">분석 및 추천</button>
         </form>
-        <div class="result-content-box">
-            <p>필수 정보를 선택해 주세요.</p>
-        </div>
     </div>
     </div>
 
