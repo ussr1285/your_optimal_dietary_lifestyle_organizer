@@ -1,37 +1,34 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, send_from_directory
 import os
+import shutil
 import Food_recommend as fr
 from werkzeug.utils import secure_filename
 import model
 
+# Flask 애플리케이션 인스턴스 생성
 app = Flask(__name__)
 
+# 업로드 파일(사진)이 저장될 서버의 폴더 경로 설정
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
-# app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # 정적 파일 캐시 비활성화
 
-# @app.after_request
-# def set_response_headers(response):
-#     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-#     response.headers['Pragma'] = 'no-cache'
-#     response.headers['Expires'] = '0'
-#     return response
-
+# YOLO 모델 로드
 yolo = model.YOLOModel()
 
-import shutil
-import os
+MEALS = ['breakfast', 'lunch', 'dinner']
+NUTRIENTS = ['kcal', 'protein', 'fat', 'carb', 'sugars', 'sodium']
 
+# path 폴더의 내부를 재귀적으로 삭제
+# 초기에 선택된 이미지가 없도록 초기화하는 용도
 def delete_folder(path):
-    # 폴더가 존재하는지 확인
     if os.path.exists(path):
-        # 폴더와 폴더 내 모든 내용 삭제
         shutil.rmtree(path)
         print(f"The folder '{path}' has been deleted.")
     else:
         print(f"The folder '{path}' does not exist.")
 
+# 업로드 폴더 구조 개설
 def check_directory():
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
@@ -40,23 +37,23 @@ def check_directory():
         if not os.path.exists(meal_folder):
             os.makedirs(meal_folder)
 
+# 메인 페이지
 @app.route('/')
 def home():
-    # 삭제할 폴더 경로
-    delete_folder("uploads")
+    # 새로고침 시 업로드 폴더 내부 파일 삭제
+    delete_folder(UPLOAD_FOLDER)
     check_directory()
     return render_template('index.html')
 
-MEALS = ['breakfast', 'lunch', 'dinner']
-NUTRIENTS = ['kcal', 'protein', 'fat', 'carb', 'sugars', 'sodium']
-### image upload section (meal:= breakfast, lunch, dinner)
-
+# 업로드 폴더 내 다음 파일 index를 반환하는 함수
 def get_next_file_index(meal):
     meal_folder = os.path.join(UPLOAD_FOLDER, meal)
     files = os.listdir(meal_folder)
     indices = [int(f.split('_')[1].split('.')[0]) for f in files if f.startswith('file_')]
     return max(indices, default=-1) + 1
 
+# @definition : 이미지를 받아 업로드 폴더에 저장
+# <meal> : breakfast, lunch, dinner 각 식사에 따라 별도 저장
 @app.route('/upload/<meal>', methods=['POST'])
 def upload_file(meal):
     if meal not in MEALS:
@@ -68,7 +65,6 @@ def upload_file(meal):
         return "No selected file", 400
     if file:
         next_index = get_next_file_index(meal)
-        print(os.path.splitext(secure_filename(file.filename)))
         file_extension = os.path.splitext(secure_filename(file.filename))[1]
         new_filename = f"file_{next_index}{file_extension}"
         meal_folder = os.path.join(UPLOAD_FOLDER, meal)
@@ -76,19 +72,29 @@ def upload_file(meal):
         file.save(filepath)
         return jsonify({"message": "File uploaded successfully", "filepath": filepath})
 
+# @definition : 요청받은 이미지를 전송
+# <meal> : breakfast, lunch, dinner 업로드 파일 경로 
+# <filename> : file_0, file_1, ... 저장된 이미지 번호, 번호가 클 수록 최신의 이미지
 @app.route('/uploads/<meal>/<filename>')
 def uploaded_file(meal, filename):
     if meal not in MEALS:
         return "Invalid meal type", 400
     return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], meal), filename)
 
+def check_nan_value(num):
+    return num if num == num else 0.0
+
+# 분석 결과 페이지로 연결
 @app.route('/submit', methods=['POST'])
 def submit():
+    # html form에서 입력받은 성별, 나이 정보 저장
     gender = request.form.get('gender')
     age = request.form.get('age')
     
     image_path = dict()
     food_list = []
+
+    # 각 식사별로 업로드된 이미지 파일 처리
     for meal in MEALS:
         meal_folder = os.path.join(UPLOAD_FOLDER, meal)
         if not os.listdir(meal_folder): 
@@ -97,7 +103,10 @@ def submit():
         last_filename = ''.join((os.listdir(meal_folder)[-1]))
         filepath = '/'.join(['.', UPLOAD_FOLDER, meal, last_filename])
         image_path[f'{meal}'] = filepath
+        # 이미지에 해당하는 음식 텍스트로 변환하여 food_list에 저장
         food_list.append(yolo.img_2_txt(filepath))
+
+    # 음식 정보를 바탕으로 영양소 분석
     results = fr.Nutrient(food_list=food_list, gender=gender, age=int(age))
     food_nutrient = results.get_nutrient_ingestion()
 
@@ -110,22 +119,33 @@ def submit():
         recommend=dict()
     )
 
+    food_need = results.get_need_nutrition()
+    food_recommend = results.get_recommend_food()
+
+    # 음식 정보를 food 딕셔너리에 저장
     for i in range(len(MEALS)):
-        food[f'{MEALS[i]}']['name'] = food_list[i]
+        food[MEALS[i]]['name'] = food_list[i]
         for j in range(len(NUTRIENTS)):
-            food[f'{MEALS[i]}'][f'{NUTRIENTS[j]}'] = food_nutrient[i][j] if food_nutrient[i][j] == food_nutrient[i][j] else 0.0 # split_Nutrient(food_nutrient[i][j])
+            food[MEALS[i]][NUTRIENTS[j]] = check_nan_value(food_nutrient[i][j])
+            if not NUTRIENTS[j] in food['today']:
+                food['today'][NUTRIENTS[j]] = 0.0
+            food['today'][NUTRIENTS[j]] += check_nan_value(food_nutrient[i][j])
+            
+    # 오늘 섭취한 영양소와 필요한 영양소 계산
     for j in range(len(NUTRIENTS)):
-        today = round(food['breakfast'][f'{NUTRIENTS[j]}'] + food['lunch'][f'{NUTRIENTS[j]}'] + food['dinner'][f'{NUTRIENTS[j]}'], 2)
-        need = results.get_need_nutrition()[j] if results.get_need_nutrition()[j] == results.get_need_nutrition()[j] else 0.0
-        need = round(need, 2)
-        food['today'][f'{NUTRIENTS[j]}'] = today
-        food['need'][f'{NUTRIENTS[j]}'] = need
-    food['recommend']['one'] = results.get_recommend_food()[0]
-    food['recommend']['two'] = results.get_recommend_food()[1]
-    food['recommend']['three'] = results.get_recommend_food()[2]
+        today = round(food['today'][NUTRIENTS[j]], 2)
+        need = round(check_nan_value(food_need[j]), 2)
+        food['today'][NUTRIENTS[j]] = today
+        food['need'][NUTRIENTS[j]] = need
+    
+    # 추천 음식 반환
+    food['recommend']['one'] = food_recommend[0]
+    food['recommend']['two'] = food_recommend[1]
+    food['recommend']['three'] = food_recommend[2]
     
     return render_template('result.html', food=food, image_path=image_path)
 
+# 서버 실행 (python app.py)
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
